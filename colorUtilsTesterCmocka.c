@@ -51,4 +51,36 @@ static void testToSepiaNull(void **state) {
   assert_int_not_equal(toSepia(&r,NULL,&b), 0);
   assert_int_not_equal(toSepia(&r,&g,NULL), 0);
 
+}/**
+ * This function tests toSepia's error handling of out-of-range
+ * values for the r, g, b parameters, each tested independently.
+ * two values are tested each: a less-than-zero value and a value
+ * greater than 255.
+ */
+static void testToSepiaOutOfBounds(void **state) {
+  int r = 0, g = 0, b = 0, big = 256, neg = -1;
+  assert_int_not_equal(toSepia(&neg,&g,&b), 0);
+  assert_int_not_equal(toSepia(&big,&g,&b), 0);
+  assert_int_not_equal(toSepia(&r,&neg,&b), 0);
+  assert_int_not_equal(toSepia(&r,&big,&b), 0);
+  assert_int_not_equal(toSepia(&r,&g,&neg), 0);
+  assert_int_not_equal(toSepia(&r,&g,&big), 0);
+  assert_int_equal(toSepia(&r,&g,&g), 0);
 }
+
+/**
+ * This function tests toSepia passing a single, hard-coded
+ * rgb-value (Steele Blue, 70, 130, 180).
+ */
+static void testToSepia001(void **state) {
+  //steel blue:
+  int r = 70, g = 130, b = 180;
+  toSepia(&r,&g,&b);
+  assert_true(r == 162 && g == 144 && b == 112);
+}
+
+/**
+ * This function is a generic testing function for toSepia
+ * in which the passed state is expected to have 6 integer values
+ * corresponding to 3 RGB input values and 3 result values
+ * that are known to be equivalent.
