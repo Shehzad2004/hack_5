@@ -130,3 +130,64 @@ static void testToGrayScaleMode(void **state) {
  * two values are tested each: a less-than-zero value and a value
  * greater than 255.
  */
+static void testToGrayScaleOutOfBounds(void **state) {
+  int r = 0, g = 0, b = 0, big = 256, neg = -1;
+  assert_int_not_equal(toGrayScale(&neg,&g,&b,AVERAGE), 0);
+  assert_int_not_equal(toGrayScale(&big,&g,&b,AVERAGE), 0);
+  assert_int_not_equal(toGrayScale(&r,&neg,&b,AVERAGE), 0);
+  assert_int_not_equal(toGrayScale(&r,&big,&b,AVERAGE), 0);
+  assert_int_not_equal(toGrayScale(&r,&g,&neg,AVERAGE), 0);
+  assert_int_not_equal(toGrayScale(&r,&g,&big,AVERAGE), 0);
+  assert_int_equal(toGrayScale(&r,&g,&g,AVERAGE), 0);
+  assert_int_equal(toGrayScale(&r,&g,&g,LUMINOSITY), 0);
+  assert_int_equal(toGrayScale(&r,&g,&g,LIGHTNESS), 0);
+}
+
+/**
+ * This function tests toGrayScale passing a single, hard-coded
+ * rgb-value (Steele Blue, 70, 130, 180) using the average
+ * method.
+ */
+static void testToGrayScale001(void **state) {
+  //steel blue:
+  int r = 70, g = 130, b = 180;
+  toGrayScale(&r,&g,&b,AVERAGE);
+  assert_true(r == 127 && g == 127 && b == 127);
+}
+
+/**
+ * This function is a generic testing function for toGrayScale
+ * in which the passed state is expected to have 6 integer values
+ * corresponding to 3 RGB input values and 3 result values
+ * that are known to be equivalent.
+ *
+ */
+static void testToGrayScaleValues(void **state) {
+  //cast the generic state to an int array
+  int *values = *((int **)state);
+
+  int r = values[0], g = values[1], b = values[2];
+
+  toGrayScale(&r, &g, &b, values[3]);
+  assert_true(
+              r == values[4] &&
+              g == values[5] &&
+              b == values[6]);
+
+}
+
+
+int main(int argc, char **argv) {
+
+  int maxTestCases[][4] = {
+    {10, 20, 30, 30},
+    {10, 30, 20, 30},
+    {20, 10, 30, 30},
+    {20, 30, 10, 30},
+    {30, 10, 20, 30},
+    {30, 20, 10, 30},
+    {10, 10, 30, 30},
+    {10, 30, 10, 30},
+    {30, 10, 10, 30},
+    {30, 30, 30, 30},
+  };
