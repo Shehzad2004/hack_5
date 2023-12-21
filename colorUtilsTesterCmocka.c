@@ -84,3 +84,49 @@ static void testToSepia001(void **state) {
  * in which the passed state is expected to have 6 integer values
  * corresponding to 3 RGB input values and 3 result values
  * that are known to be equivalent.
+  *
+ */
+static void testToSepiaValues(void **state) {
+  //cast the generic state to an int array
+  int *values = *((int **)state);
+  int r = values[0];
+  int g = values[1];
+  int b = values[2];
+  toSepia(&r, &g, &b);
+  assert_true(r == values[3] && g == values[4] && b == values[5]);
+}
+
+/**
+ * This function tests toGrayScale's error handling of NULL
+ * values for its pass-by-reference parameters.  Each of
+ * the three parameters are tested independently.  The function
+ * should return a non-zero error value so we assert that the
+ * return value is not equal to zero.
+ *
+ */
+static void testToGrayScaleNull(void **state) {
+  int r = 0, g = 0, b = 0;
+  assert_int_not_equal(toGrayScale(NULL,&g,&b,AVERAGE), 0);
+  assert_int_not_equal(toGrayScale(&r,NULL,&b,AVERAGE), 0);
+  assert_int_not_equal(toGrayScale(&r,&g,NULL,AVERAGE), 0);
+}
+
+/**
+ * This function tests toGrayScale's error handling of invalid
+ * values for its Mode parameter.  The function
+ * should return a non-zero error value so we assert that the
+ * return value is not equal to zero.
+ *
+ */
+static void testToGrayScaleMode(void **state) {
+  int r = 0, g = 0, b = 0;
+  assert_int_not_equal(toGrayScale(NULL,&g,&b,0), 0);
+  assert_int_not_equal(toGrayScale(&r,NULL,&b,4), 0);
+}
+
+/**
+ * This function tests toGrayScale's error handling of out-of-range
+ * values for the r, g, b parameters, each tested independently.
+ * two values are tested each: a less-than-zero value and a value
+ * greater than 255.
+ */
